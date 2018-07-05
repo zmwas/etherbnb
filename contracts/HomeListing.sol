@@ -17,9 +17,6 @@ contract HomeListing {
     event HomeEvent(uint _id);
     event Test(uint length);
     uint[]  results;
-    constructor() {
-
-    }
 
     // @param physicalAddress - the actual address of the home a host wants to list (not the ethereum address)
     function addHome(string _physicalAddress, uint rent) public {
@@ -41,10 +38,10 @@ contract HomeListing {
         return results;
     }
 
-    function bookHome(uint _id) public payable {
-        idToHome[_id];
+    function bookHome(uint _id) public  payable{
+        require(msg.value>=idToHome[_id].rent);
         if (idToHome[_id].available) {
-            msg.sender.transfer(idToHome[_id].rent);
+            idToHome[_id].owner.transfer(idToHome[_id].rent);
             idToHome[_id].available = false;
         }
     }
