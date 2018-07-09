@@ -15,8 +15,12 @@ contract HomeListing {
     Home[] public homes;
     mapping (uint => Home) idToHome;
     event HomeEvent(uint _id);
-    event Test(uint length);
     uint[]  results;
+
+    modifier onlyHost(uint _id) {
+        require(msg.sender == idToHome[_id].owner);
+        _;
+    }
 
     // @param physicalAddress - the actual address of the home a host wants to list (not the ethereum address)
     function addHome(string _physicalAddress, uint rent) public {
@@ -24,6 +28,20 @@ contract HomeListing {
         Home memory home = Home(_id, _physicalAddress, msg.sender, rent, true);
         idToHome[_id] = home;
         homes.push(home);
+    }
+
+    // @param _id - id of the home being edited
+    // @param _price - new price of the home
+    function updateRent(uint _id, uint _rent)  public onlyHost(_id) {
+        // update home
+        Home storage home =  idToHome[_id];
+        home.rent = _rent;
+
+        for(uint i = 0 ; i<homes.length; i++) {
+            if(i == _id) {
+                homes[i].rent =  _rent;
+            }
+        }
     }
 
     // @param physicalAddress - the actual address of the home a host wants to list (not the ethereum address)
